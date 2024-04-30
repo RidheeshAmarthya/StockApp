@@ -8,8 +8,10 @@
     app:layout_constraintTop_toTopOf="parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- Any other toolbar children here -->
 
-    <!-- Stock Page top bar text formatting (Stock Ticker) -->
+
+
     <TextView
         android:id="@+id/toolbar_text"
         android:layout_width="wrap_content"
@@ -17,7 +19,7 @@
         android:layout_gravity="left"
         android:textAppearance="?attr/textAppearanceHeadline6"
         android:textColor="@color/black"
-        />
+    />
 
 
 </androidx.appcompat.widget.Toolbar>
