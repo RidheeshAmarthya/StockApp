@@ -23,4 +23,14 @@
       app:layout_constraintRight_toRightOf="parent"
       />
 
+  <WebView
+      android:id="@+id/chart1"
+      android:layout_width="388dp"
+      android:layout_height="299dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.497"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/textView_query" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

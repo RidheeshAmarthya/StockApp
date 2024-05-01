@@ -1,6 +1,7 @@
 package com.example.stockapp;
 
 import android.os.Bundle;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -44,6 +45,11 @@ public class SearchActivity extends AppCompatActivity {
         queryTextView.setText(query);
         TextView queryBarView = findViewById(R.id.toolbar_text);
         queryBarView.setText(query);
+
+        //HTML view
+        WebView webview = (WebView) findViewById(R.id.chart1);
+        webview.loadUrl("file:///android_asset/chart1.html");
+        webview.getSettings().setJavaScriptEnabled(true); // pffffft security
     }
 }
 
