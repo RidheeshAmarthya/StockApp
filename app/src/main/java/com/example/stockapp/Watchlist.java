@@ -1,6 +1,7 @@
 package com.example.stockapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -35,12 +36,18 @@ public class Watchlist {
     public Watchlist(Activity activity, RecyclerView recyclerView) {
         this.activity = activity;
         this.recyclerView = recyclerView;
-        this.adapter = new WatchlistAdapter(activity, watchlistItems);
+        this.adapter = new WatchlistAdapter(activity, watchlistItems, this::handleItemClick);
         this.recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         this.recyclerView.setAdapter(adapter);
-        new ItemTouchHelper(simpleItemTouchCallback).attachToRecyclerView(recyclerView);
+        new ItemTouchHelper(simpleItemTouchCallback).attachToRecyclerView(this.recyclerView);
 
         fetchWatchListData();
+    }
+
+    private void handleItemClick(WatchlistItem item) {
+        Intent intent = new Intent(activity, SearchActivity.class);
+        intent.putExtra("query", item.getSymbol());
+        activity.startActivity(intent);
     }
 
     public void fetchWatchListData() {
@@ -190,5 +197,4 @@ public class Watchlist {
             }
         }
     };
-
 }
