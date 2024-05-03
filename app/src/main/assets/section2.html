@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Quote Display</title>
+    <style>
+        body {
+          font-family: 'Roboto', sans-serif;
+          font-size: 40px;
+          padding: 25px;
+        }
+    .line { display: flex; justify-content: space-between; }
+    .item { margin-right: 10px; } /* Adds a small space between items on the same line */
+    </style>
+    <script>
+        // Function to get query parameters from the URL
+function getQueryParam(param) {
+    var searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get(param);
+}
+
+// Get the 'query' parameter from the URL
+const ticker = getQueryParam('query') || 'AAPL'; // Default to 'AAPL' if no query provided
+
+document.addEventListener('DOMContentLoaded', function() {
+fetchStockQuote(ticker); // Automatically fetch data for the stock symbol when page loads
+});
+
+
+// Function to fetch stock data
+function fetchStockQuote(symbol) {
+    const apiKey = 'co2aripr01qvggedvg6gco2aripr01qvggedvg70'; // Replace this with your actual API key
+    const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`;
+
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('open').innerText = 		    `Open:           $${data.o}`;
+        document.getElementById('high').innerText = 			`High:           $${data.h}`;
+        document.getElementById('low').innerText = 				`Low:            $${data.l}`;
+        document.getElementById('previousClose').innerText = 	`Previous Close: $${data.pc}`;
+    })
+    .catch(error => console.error('Error fetching data:', error));
+}
+    </script>
+</head>
+<body>
+<h3>Stats</h3>
+<div id="stockInfo">
+    <div class="line">
+        <p id="open" class="item"></p>
+        <p id="high" class="item"></p>
+    </div>
+    <div class="line">
+        <p id="low" class="item"></p>
+        <p id="previousClose" class="item"></p>
+    </div>
+</div>
+</body>
+</html>

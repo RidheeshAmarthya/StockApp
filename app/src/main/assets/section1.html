@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+    <style>
+        body {
+          font-family: 'Roboto', sans-serif;
+        }
+        .positive-change { color: green; }
+        .negative-change { color: red; }
+        .label {
+          margin-bottom: 10px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .label-number {
+          margin-left: 50px;
+        }
+    </style>
+</head>
+<body>
+<h3>Portfolio</h3>
+<div id="portfolioApp" class="portfolio-container">
+    <div id="loading" class="loading-container">
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div id="stocks"></div>
+</div>
+</div>
+
+<script>
+    const token = 'co2aripr01qvggedvg6gco2aripr01qvggedvg70'; // Use your actual token
+
+
+            // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            var searchParams = new URLSearchParams(window.location.search);
+            return searchParams.get(param);
+        }
+
+        // Get the 'query' parameter from the URL
+        const targetedTicker = getQueryParam('query') || 'AAPL'; // Default to 'AAPL' if no query provided
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchPortfolio();
+    });
+
+    async function fetchPortfolio() {
+      const portfolioResponse = await fetch("https://stock-app3-backend-obu6dw52ya-wm.a.run.app/portfolio");
+      let portfolioData = await portfolioResponse.json();
+
+      // Filter the portfolio to only include the stock with the ticker 'AAPL'
+      portfolioData = portfolioData.filter(stock => stock.ticker === targetedTicker);
+
+      // Fetch current stock price and daily change
+      const quoteResponse = await fetch(`https://finnhub.io/api/v1/quote?symbol=${targetedTicker}&token=${token}`);
+      const quoteData = await quoteResponse.json();
+
+     const stocksContent = portfolioData.map(stock => {
+    const avgCostPerShare = stock.quantity > 0 ? (stock.totalcost / stock.quantity).toFixed(2) : '0.00';
+    return `
+        <div class="stock-stuff">
+          <div>
+            <p class="label">Shares Owned:<span class="label-number">${stock.quantity}</span></p>
+            <p class="label">Avg. Cost / Share:<span class="label-number">${avgCostPerShare}</span></p>
+            <p class="label">Total Cost:<span class="label-number">${stock.totalcost.toFixed(2)}</span></p>
+            <p class="label ${quoteData.d < 0 ? 'negative-change' : 'positive-change'}">Change:<span class="label-number">$${quoteData.d.toFixed(2)}</span></p>
+            <p class="label ${quoteData.d < 0 ? 'negative-change' : 'positive-change'}">Market Value:<span class="label-number">$${quoteData.c.toFixed(2)}</span></p>
+          </div>
+        </div>
+    `;
+}).join('');
+
+      document.getElementById('stocks').innerHTML = stocksContent;
+
+      document.getElementById('loading').style.display = 'none';
+    }
+</script>
+</body>
+</html>

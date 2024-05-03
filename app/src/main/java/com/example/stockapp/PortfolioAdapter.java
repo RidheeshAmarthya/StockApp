@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,12 +50,22 @@ public class PortfolioAdapter extends RecyclerView.Adapter<PortfolioAdapter.Port
     }
 
     public static class PortfolioViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private TextView textViewSymbol;
+        private TextView textViewPrice;
+        private TextView textViewName;
+        private TextView textViewChange;
+        private TextView textViewChangePercent;
+        private ImageView imageView;
         private OnItemClickListener listener;
 
         public PortfolioViewHolder(View itemView, OnItemClickListener listener) {
             super(itemView);
-            this.textView = itemView.findViewById(R.id.text_view_watchlist);
+            textViewSymbol = itemView.findViewById(R.id.text_view_symbol);
+            textViewPrice = itemView.findViewById(R.id.text_view_price);
+            textViewName = itemView.findViewById(R.id.text_view_name);
+            textViewChange = itemView.findViewById(R.id.text_view_change);
+            textViewChangePercent = itemView.findViewById(R.id.text_view_change_percent);
+            imageView = itemView.findViewById(R.id.imageView);
             this.listener = listener;
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -65,13 +76,19 @@ public class PortfolioAdapter extends RecyclerView.Adapter<PortfolioAdapter.Port
         }
 
         public void bind(PortfolioItem item) {
-            String text = String.format(Locale.getDefault(), "%s x%d @ $%.2f\nTotal Cost: $%.2f",
-                    item.getSymbol(), item.getQuantity(), item.getCurrentPrice(), item.getTotalCost());
-            SpannableString spannableString = new SpannableString(text);
-            int startTotalCost = text.indexOf("Total Cost:");
-            int endTotalCost = startTotalCost + String.format("Total Cost: $%.2f", item.getTotalCost()).length();
-            spannableString.setSpan(new ForegroundColorSpan(Color.BLUE), startTotalCost, endTotalCost, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            textView.setText(spannableString);
+            textViewSymbol.setText(item.getSymbol());
+            textViewPrice.setText(String.format(Locale.getDefault(), "$%.2f", item.getCurrentPrice()));
+            textViewName.setText(item.getQuantity() + " shares");
+            double change = item.getChange();
+            textViewChange.setText(String.format(Locale.getDefault(), "$%.2f shares", change));
+            textViewChangePercent.setText(String.format(Locale.getDefault(), " (%.2f%%)", item.getChangePercent()));
+
+            // Set color based on positive or negative change
+            int color = change >= 0 ? Color.parseColor("#319c5e") : Color.RED;
+            textViewChange.setTextColor(color);
+            textViewChangePercent.setTextColor(color);
+
+            imageView.setImageResource(change >= 0 ? R.drawable.trending_up : R.drawable.trending_down);
         }
     }
 }

@@ -35,6 +35,9 @@
         android:layout_marginTop="40dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
+        android:textStyle="bold"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:text="PORTFOLIO"
         android:background="@color/light_grey"
         android:textColor="@android:color/black"
@@ -61,6 +64,23 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
+        android:id="@+id/dollar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="464dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="$"
+        android:textColor="@color/grey"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Cash_Balance"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
         android:id="@+id/Net_Worth"
         android:layout_width="203dp"
         android:layout_height="26dp"
@@ -69,7 +89,7 @@
         android:paddingRight="16dp"
         android:text="Net Worth"
         android:textColor="@color/grey"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/Cash_Balance"
         app:layout_constraintHorizontal_bias="0.0"
@@ -86,7 +106,7 @@
         android:paddingRight="16dp"
         android:text="$25000.00"
         android:textColor="@color/grey"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -103,7 +123,7 @@
         android:paddingRight="16dp"
         android:text="Cash Balance"
         android:textColor="@color/grey"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -118,6 +138,9 @@
         android:background="@color/light_grey"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:textStyle="bold"
         android:text="FAVORITES"
         android:textColor="@android:color/black"
         android:textSize="16sp"
@@ -145,6 +168,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Net_Worth_val"
         app:layout_constraintVertical_bias="0.0" />
+
+
+    <TextView
+    android:id="@+id/finnhub"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:text="Powered by Finnhub"
+    android:textColor="@android:color/black"
+    android:textSize="14sp"
+    android:textAlignment="center"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/recycler_watchlist"
+    app:layout_constraintVertical_bias="0.0"
+        android:paddingTop="20dp"
+        android:autoLink="web"
+        android:onClick="openFinnhubWebsite"
+        tools:layout_editor_absoluteX="0dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

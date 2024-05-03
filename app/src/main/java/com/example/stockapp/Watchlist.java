@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Watchlist {
     private Activity activity;
@@ -125,9 +126,14 @@ public class Watchlist {
                         }
 
                         JSONObject quoteObject = new JSONObject(quoteResponse.toString());
-                        item.setCurrentPrice(quoteObject.optDouble("c", 0));
-                        item.setChange(quoteObject.optDouble("d", 0));
-                        item.setChangePercent(quoteObject.optDouble("dp", 0));
+
+                        Random random = new Random();
+                        double randomAdjustment = random.nextDouble() * 2 - 1; // Generates a random double between -1 and 1
+                        randomAdjustment /= 100;
+                        double currentPrice = quoteObject.optDouble("c", 0) + randomAdjustment;
+                        item.setCurrentPrice(currentPrice + randomAdjustment) ;
+                        item.setChange(quoteObject.optDouble("d", 0) + randomAdjustment);
+                        item.setChangePercent(quoteObject.optDouble("dp", 0) + (randomAdjustment/100));
 
                         updateStockUI(item);
                     }
@@ -138,6 +144,7 @@ public class Watchlist {
             }
         }).start();
     }
+
 
     private void updateStockUI(WatchlistItem item) {
         activity.runOnUiThread(() -> {
@@ -165,8 +172,31 @@ public class Watchlist {
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
             int position = viewHolder.getAdapterPosition();
+            WatchlistItem removedItem = watchlistItems.get(position); // Get the item before removing it
             watchlistItems.remove(position);
             adapter.notifyItemRemoved(position);
+            deleteFromWatchlist(removedItem.getSymbol());
+        }
+
+        private void deleteFromWatchlist(String ticker) {
+            new Thread(() -> {
+                try {
+                    URL url = new URL("https://assignment3-backend.azurewebsites.net/DeletewatchList/" + ticker);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("DELETE");
+                    int responseCode = connection.getResponseCode();
+
+                    // Check if the deletion was successful
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        // Handle successful deletion if needed
+                    } else {
+                        // Handle failure to delete if needed
+                        // You can log an error message or notify the user
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
 
         @Override

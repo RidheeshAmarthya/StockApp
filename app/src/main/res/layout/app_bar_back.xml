@@ -5,19 +5,32 @@
     android:layout_height="?attr/actionBarSize"
     android:background="@color/white"
     android:navigationIcon="@drawable/ic_arrow_back"
-    app:layout_constraintTop_toTopOf="parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:contentInsetStart="0dp"
+    app:contentInsetLeft="0dp">
 
-    <!-- Stock Page top bar text formatting (Stock Ticker) -->
-    <TextView
-        android:id="@+id/toolbar_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:textAppearance="?attr/textAppearanceHeadline6"
-        android:textColor="@color/black"
-        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/toolbar_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:textColor="@color/black" />
 
+        <ImageView
+            android:id="@+id/star_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/star_border"
+            android:padding="8dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
 </androidx.appcompat.widget.Toolbar>

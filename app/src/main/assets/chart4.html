@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings Surprise Chart</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+<div id="earnings-surprise-chart-container" style="width:100%; height:400px;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const apiKey = 'co2aripr01qvggedvg6gco2aripr01qvggedvg70';  // Replace 'YOUR_API_KEY' with your actual API key from Finnhub
+                // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            var searchParams = new URLSearchParams(window.location.search);
+            return searchParams.get(param);
+        }
+
+        // Get the 'query' parameter from the URL
+        const ticker = getQueryParam('query') || 'AAPL'; // Default to 'AAPL' if no query provided
+        const url = `https://finnhub.io/api/v1/stock/earnings?symbol=${ticker}&token=${apiKey}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const earningsData = data.map(item => ({
+                    actual: item.actual,
+                    estimate: item.estimate,
+                    quarter: item.quarter,
+                    year: item.year,
+                    period: item.period
+                }));
+                renderChart(earningsData);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        function renderChart(earningsData) {
+            const categories = earningsData.map(dataPoint => {
+                const surprise = dataPoint.actual - dataPoint.estimate;
+                let monthDay;
+                switch (dataPoint.quarter) {
+                    case 1: monthDay = "01-01"; break;
+                    case 2: monthDay = "04-01"; break;
+                    case 3: monthDay = "07-01"; break;
+                    case 4: monthDay = "10-01"; break;
+                    default: monthDay = "01-01";
+                }
+                const dateString = `${dataPoint.year}-${monthDay}`;
+                return `${dateString}<br><span style="display:inline-block; min-width:50px;">Surprise:&nbsp;${surprise.toFixed(2)}</span><br>`;
+            });
+
+            const actualEarnings = {
+                name: 'Actual',
+                data: earningsData.map(dataPoint => dataPoint.actual),
+                marker: { symbol: 'square' }
+            };
+
+            const estimatedEarnings = {
+                name: 'Estimated',
+                data: earningsData.map(dataPoint => dataPoint.estimate),
+                marker: { symbol: 'diamond' }
+            };
+
+            Highcharts.chart('earnings-surprise-chart-container', {
+                chart: { type: 'spline', backgroundColor: '#f0f0f0' },
+                title: { text: 'Historical EPS Surprises' },
+                xAxis: {
+                    categories: categories,
+                    labels: { useHTML: true },
+                    title: { text: 'Period' }
+                },
+                yAxis: {
+                    title: { text: 'Quarterly EPS' },
+                    labels: { format: '{value}' }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true,
+                    valueSuffix: ' USD',
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> USD<br/>'
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [actualEarnings, estimatedEarnings]
+            });
+        }
+    });
+</script>
+</body>
+</html>

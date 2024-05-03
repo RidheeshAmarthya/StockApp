@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Section</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .news-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-left: 10px;
+            background: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .news-item img {
+            width: 100px;
+            height: 100px;
+            margin-left: 20px;
+            border-radius: 5px;
+        }
+        .news-content {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .news-source-time {
+            font-size: 0.85em;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+			padding-bottom 5px;
+			padding-top 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            float: right;
+            cursor: pointer;
+        }
+        .share-buttons {
+            margin-top: 10px;
+        }
+        .share-buttons img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        .first-news-item {
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: center;
+        }
+        .first-news-item img {
+            width: 100%;
+            height: auto;
+            margin: 0 0 20px 0;
+        }
+        .first-news-item .news-content {
+            text-align: left;
+            width: 100%;
+			padding 10px;
+        }
+		.modal-date {
+    text-align: left; /* Aligns the text to the left */
+    margin-top: 10px; /* Adds space above the date */
+    padding-left: 20px; /* Adds padding on the left for better alignment within the modal */
+}
+
+    </style>
+</head>
+<body>
+<h3>News</h3>
+<div id="news-container">
+    <!-- News items will be inserted here -->
+</div>
+
+<div id="news-modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modal-title">News Title</h3>
+        <span id="modal-date"></span> <!-- No inline style here; controlled by CSS -->
+        <hr>
+        <p id="modal-summary">Summary of the news...</p>
+        <div class="share-buttons" style="text-align: center;">
+            <a href="#" id="share-url"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimagepng.org%2Fwp-content%2Fuploads%2F2019%2F08%2Fgoogle-chrome-icon-1.png" alt="Copy URL"></a>
+            <a href="#" id="share-twitter"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fseeklogo.com%2Fimages%2FT%2Ftwitter-x-logo-ACDB3F35D8-seeklogo.com.png" alt="Share on Twitter"></a>
+            <a href="#" id="share-facebook"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2F0%2F05%2FFacebook_Logo_(2019).png" alt="Share on Facebook"></a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Function to get query parameters from the URL
+function getQueryParam(param) {
+    var searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get(param);
+}
+
+// Get the 'query' parameter from the URL
+const ticker = getQueryParam('query') || 'AAPL'; // Default to 'AAPL' if no query provided
+const apiKey = 'co2aripr01qvggedvg6gco2aripr01qvggedvg70';
+const newsUrl = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=2024-05-01&to=2024-05-02&token=${apiKey}`;
+
+async function fetchNews() {
+try {
+    const response = await fetch(newsUrl);
+    const newsItems = await response.json();
+    displayNews(newsItems);
+} catch (error) {
+    console.error('Failed to fetch news:', error);
+}
+}
+
+function displayNews(newsItems) {
+    const now = new Date().getTime() / 1000; // Get current time in seconds
+    const newsContainer = document.getElementById('news-container');
+    // Limit the number of news items to display to 10
+    newsItems.slice(0, 10).forEach((item, index) => {
+        const timeDiff = now - item.datetime;
+        if (timeDiff < 86400) { // Only show news from the last 24 hours
+            const hoursAgo = Math.round(timeDiff / 3600);
+            const newsItem = document.createElement('div');
+            newsItem.className = index === 0 ? 'news-item first-news-item' : 'news-item';
+
+            const contentHTML = `
+                <div class="news-content">
+                    <div class="news-source-time">
+                        <span>${item.source}</span>
+                        <span class="time-ago">${hoursAgo} hours ago</span>
+                    </div>
+                    <strong>${item.headline}</strong>
+                    <br><br>
+                </div>`;
+
+            const imageHTML = `<img src="${item.image}" alt="News Image" onerror="this.onerror=null; this.src='https://u.osu.edu/duska.7/files/2017/04/stock-market-3-21gyd1b.jpg'">`;
+
+            if (index === 0) {
+                // First news item: Image above, content below
+                newsItem.innerHTML = `${imageHTML} ${contentHTML}`;
+            } else {
+                // Other news items: Content left, image right
+                newsItem.innerHTML = `${contentHTML} ${imageHTML}`;
+            }
+
+            newsItem.addEventListener('click', () => {
+                openModal(item);
+            });
+            newsContainer.appendChild(newsItem);
+        }
+    });
+}
+
+
+
+function openModal(item) {
+const modal = document.getElementById('news-modal');
+const modalTitle = document.getElementById('modal-title');
+const modalDate = document.getElementById('modal-date');
+const modalSummary = document.getElementById('modal-summary');
+const urlShare = document.getElementById('share-url');
+const twitterShare = document.getElementById('share-twitter');
+const facebookShare = document.getElementById('share-facebook');
+
+const date = new Date(item.datetime * 1000); // Convert UNIX timestamp to JavaScript Date
+const options = { year: 'numeric', month: 'long', day: 'numeric' };
+modalDate.textContent = date.toLocaleDateString('en-US', options);
+
+modal.style.display = 'flex';
+modalTitle.textContent = item.headline;
+modalSummary.textContent = item.summary;
+urlShare.href = item.url;
+twitterShare.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(item.headline)}&url=${encodeURIComponent(item.url)}`;
+facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(item.url)}`;
+
+window.onclick = function(event) {
+if (event.target === modal) {
+modal.style.display = 'none';
+}
+};
+}
+
+
+fetchNews();
+</script>
+</body>
+</html>

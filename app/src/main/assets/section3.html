@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the Company</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        a {
+            color: blue;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .scroll-container {
+            overflow-x: auto; /* Enables horizontal scrolling */
+            white-space: nowrap; /* Keeps the peers in a single line */
+        }
+        .scroll-container p {
+            display: inline-block; /* Allows peers to sit side by side */
+            margin-right: 15px; /* Adds space between the items */
+        }
+    </style>
+</head>
+<body>
+<h3>About</h3>
+<div class="container">
+    <p><strong>IPO Start Date </strong> <span id="ipo"></span></p>
+    <p><strong>Industry </strong> <span id="industry"></span></p>
+    <p><strong>Website </strong> <a id="website" href="" target="_blank">Visit</a></p>
+    <div class="scroll-container" id="peers">
+    </div>
+</div>
+
+<script>
+    // Function to get query parameters from the URL
+function getQueryParam(param) {
+    var searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get(param);
+}
+
+// Get the 'query' parameter from the URL
+const ticker = getQueryParam('query') || 'AAPL'; // Default to 'AAPL' if no query provided
+const apiKey = 'co2aripr01qvggedvg6gco2aripr01qvggedvg70'; // Replace with your actual API key
+const profileUrl = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
+const peersUrl = `https://finnhub.io/api/v1/stock/peers?symbol=${ticker}&token=${apiKey}`;
+
+async function fetchCompanyInfo() {
+try {
+    const profileResponse = await fetch(profileUrl);
+    const profileData = await profileResponse.json();
+
+    document.getElementById('ipo').textContent = profileData.ipo;
+    document.getElementById('industry').textContent = profileData.finnhubIndustry;
+    document.getElementById('website').href = profileData.weburl;
+    document.getElementById('website').textContent = profileData.weburl;
+
+setTimeout(async () => {
+    const peersResponse = await fetch(peersUrl);
+    const peersData = await peersResponse.json();
+    const peersContainer = document.getElementById('peers');
+    peersData.forEach(peer => {
+        const peerP = document.createElement('p');
+        const peerLink = document.createElement('a');
+        peerLink.href = `http://text.com/${peer}`; // Construct the URL
+        peerLink.textContent = peer; // Set the peer name as the link text
+        peerLink.target = "_blank"; // Optional: Open in a new tab
+        peerP.appendChild(peerLink); // Append the link to the paragraph
+        peersContainer.appendChild(peerP); // Append the paragraph to the container
+    });
+}, 10); // Delay of 1000 milliseconds
+
+
+} catch (error) {
+    console.error('Failed to fetch company info:', error);
+}
+}
+
+fetchCompanyInfo();
+</script>
+
+</body>
+</html>

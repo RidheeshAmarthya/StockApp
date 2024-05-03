@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis Chart</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="stock-analysis-chart-container"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            var searchParams = new URLSearchParams(window.location.search);
+            return searchParams.get(param);
+        }
+
+        // Get the 'query' parameter from the URL
+        const ticker = getQueryParam('query') || 'AAPL'; // Default to 'AAPL' if no query provided
+
+        const apiKey = 'co2aripr01qvggedvg6gco2aripr01qvggedvg70'; // Your Finnhub API key
+        const url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${ticker}&token=${apiKey}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Extract categories (periods) from the data
+                const categories = data.map(dataPoint => dataPoint.period);
+
+                // Prepare the series data for Highcharts
+                const seriesData = [
+                    { name: "Strong Buy", data: data.map(dataPoint => dataPoint.strongBuy), color: "#4caf50" }, // Green
+                    { name: "Buy", data: data.map(dataPoint => dataPoint.buy), color: "#8bc34a" }, // Light Green
+                    { name: "Hold", data: data.map(dataPoint => dataPoint.hold), color: "#ffeb3b" }, // Yellow
+                    { name: "Sell", data: data.map(dataPoint => dataPoint.sell), color: "#ff9800" }, // Orange
+                    { name: "Strong Sell", data: data.map(dataPoint => dataPoint.strongSell), color: "#f44336" } // Red
+                ];
+
+                // Initialize Highcharts
+                Highcharts.chart('stock-analysis-chart-container', {
+                    chart: { type: 'column' },
+                    title: { text: `${ticker} Stock Analyst Recommendations` },
+                    xAxis: { categories: categories, crosshair: true },
+                    yAxis: { min: 0, title: { text: 'Number of Analysts' }, stackLabels: { enabled: true } },
+                    tooltip: {
+                        headerFormat: '<b>{point.x}</b><br/>',
+                        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: { enabled: true }
+                        }
+                    },
+                    series: seriesData
+                });
+            })
+            .catch(error => console.error('Error loading analysis data:', error));
+    });
+</script>
+</body>
+</html>

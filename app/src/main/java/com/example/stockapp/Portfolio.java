@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Portfolio {
     private Activity activity;
@@ -64,7 +65,10 @@ public class Portfolio {
                         String symbol = portfolioItemJson.getString("ticker");
                         int quantity = portfolioItemJson.getInt("quantity");
                         double totalCost = portfolioItemJson.getDouble("totalcost");
-                        newItems.add(new PortfolioItem(symbol, 0, 0, 0, quantity, totalCost));  // Stock data is filled later
+                        if (quantity > 0) {
+                            newItems.add(new PortfolioItem(symbol, 0, 0, 0, quantity, totalCost));  // Stock data is filled later
+                        }
+
                     }
                     updatePortfolioUI(newItems);
                 } else {
@@ -105,20 +109,27 @@ public class Portfolio {
                     }
 
                     JSONObject quoteObject = new JSONObject(response.toString());
-                    item.setCurrentPrice(quoteObject.optDouble("c", 0));
-                    item.setChange(quoteObject.optDouble("d", 0));
-                    item.setChangePercent(quoteObject.optDouble("dp", 0));
 
+                    Random random = new Random();
+                    double randomAdjustment = random.nextDouble() * 2 - 1; // Generates a random double between -1 and 1
+                    randomAdjustment /= 100;
+                    double currentPrice = quoteObject.optDouble("c", 0) + randomAdjustment;
+                    item.setCurrentPrice(currentPrice + randomAdjustment) ;
+                    item.setChange(quoteObject.optDouble("d", 0) + randomAdjustment);
+                    item.setChangePercent(quoteObject.optDouble("dp", 0) + (randomAdjustment/100));
+
+                    // Run UI update on the main thread
                     activity.runOnUiThread(() -> adapter.notifyItemChanged(portfolioItems.indexOf(item)));
                 } else {
-                    Toast.makeText(activity, "Failed to fetch stock data for " + item.getSymbol(), Toast.LENGTH_LONG).show();
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Failed to fetch stock data for " + item.getSymbol(), Toast.LENGTH_LONG).show());
                 }
             } catch (Exception e) {
-                Toast.makeText(activity, "Error fetching stock data: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                activity.runOnUiThread(() -> Toast.makeText(activity, "Error fetching stock data: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 e.printStackTrace();
             }
         }).start();
     }
+
 
     private ItemTouchHelper.SimpleCallback createItemTouchHelperCallback() {
         return new ItemTouchHelper.SimpleCallback(
